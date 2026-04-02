@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MAYSS — Marketplace</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="api.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="api-bridge.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="screens/landing.jsx"></script>
+<script type="text/babel" src="screens/catalog.jsx"></script>
+<script type="text/babel" src="screens/product.jsx"></script>
+<script type="text/babel" src="screens/cart.jsx"></script>
+<script type="text/babel" src="screens/auth.jsx"></script>
+<script type="text/babel" src="screens/account-bonus.jsx"></script>
+<script type="text/babel" src="screens/account.jsx"></script>
+<script type="text/babel" src="screens/seller.jsx"></script>
+<script type="text/babel" src="screens/admin.jsx"></script>
+<script type="text/babel" src="screens/pay.jsx"></script>
+<script type="text/babel" src="screens/ds.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="screens/public.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "primaryHue": 252,
+  "density": "comfort",
+  "heroVariant": "editorial",
+  "darkAdmin": true
+}/*EDITMODE-END*/;
+
+const SCREENS = [
+  { id: 'landing', label: 'Лендинг', n: '01' },
+  { id: 'catalog', label: 'Каталог', n: '02' },
+  { id: 'product', label: 'Товар', n: '03' },
+  { id: 'cart', label: 'Корзина / Чекаут', n: '04' },
+  { id: 'auth', label: 'Авторизация', n: '05' },
+  { id: 'account', label: 'Кабинет покупателя', n: '06' },
+  { id: 'seller', label: 'Кабинет продавца', n: '07' },
+  { id: 'admin', label: 'Админ-панель', n: '08' },
+  { id: 'pay', label: 'Оплата', n: '09' },
+  { id: 'ds', label: 'Design System', n: 'DS' },
+  { id: 'shop', label: 'Профиль магазина', n: '10' },
+  { id: 'user', label: 'Профиль покупателя', n: '11' },
+];
+
+function App() {
+  const parseRoute = () => {
+    const h = (location.hash || '#landing').slice(1);
+    return (h.split('?')[0]) || 'landing';
+  };
+  const [route, setRoute] = useState(parseRoute);
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [navOpen, setNavOpen] = useState(false);
+  const [bridgeReady, setBridgeReady] = useState(false);
+
+  useEffect(() => {
+    if (window.__bridgeReady) {
+      window.__bridgeReady.then(() => setBridgeReady(true)).catch(() => setBridgeReady(true));
+    } else {
+      setBridgeReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onHash = () => { setRoute(parseRoute()); window.scrollTo(0, 0); };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--brand', `oklch(0.58 0.22 ${tweaks.primaryHue})`);
+    document.documentElement.style.setProperty('--brand-ink', `oklch(0.42 0.20 ${tweaks.primaryHue})`);
+    document.documentElement.style.setProperty('--brand-soft', `oklch(0.95 0.04 ${tweaks.primaryHue})`);
+    document.documentElement.dataset.density = tweaks.density;
+    window.__tweaks = tweaks;
+  }, [tweaks]);
+
+  // Tweaks edit-mode protocol
+  const [editMode, setEditMode] = useState(false);
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setEditMode(true);
+      if (e.data?.type === '__deactivate_edit_mode') setEditMode(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const setTweak = (key, value) => {
+    const next = typeof key === 'object' ? { ...tweaks, ...key } : { ...tweaks, [key]: value };
+    setTweaks(next);
+    const edits = typeof key === 'object' ? key : { [key]: value };
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+  };
+
+  const nav = (id) => { location.hash = id; setRoute(id); window.scrollTo(0, 0); };
+
+  if (!bridgeReady) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: 16 }}>
+        <div style={{ fontSize: 14, color: 'var(--ink-3)' }}>Загрузка MAYSS...</div>
+      </div>
+    );
+  }
+
+  const screenComp = {
+    landing: window.MAYSS_SCREENS.Landing,
+    catalog: window.MAYSS_SCREENS.Catalog,
+    product: window.MAYSS_SCREENS.Product,
+    cart: window.MAYSS_SCREENS.Cart,
+    auth: window.MAYSS_SCREENS.Auth,
+    account: window.MAYSS_SCREENS.Account,
+    seller: window.MAYSS_SCREENS.Seller,
+    admin: window.MAYSS_SCREENS.Admin,
+    pay: window.MAYSS_SCREENS.Pay,
+    ds: window.MAYSS_SCREENS.DesignSystem,
+    shop: window.MAYSS_SCREENS.PublicShop, 
+    user: window.MAYSS_SCREENS.PublicUser,
+  }[route] || window.MAYSS_SCREENS.Landing;
+
+  const Comp = screenComp;
+
+  // Floating screen-jump nav
+  const ScreenSwitcher = () => (
+    <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 200 }}>
+      {!navOpen ? (
+        <button onClick={() => setNavOpen(true)} style={{ background: 'var(--ink)', color: 'white', border: 'none', borderRadius: 999, padding: '12px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: 'var(--sh-3)', display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'inherit' }} data-screen-label={`${SCREENS.find(s => s.id === route)?.n} ${SCREENS.find(s => s.id === route)?.label}`}>
+          <span className="mono" style={{ fontSize: 11, opacity: .6 }}>{SCREENS.find(s => s.id === route)?.n}</span>
+          {SCREENS.find(s => s.id === route)?.label}
+          <span style={{ width: 1, height: 14, background: 'rgba(255,255,255,0.2)' }} />
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"><path d="m6 9 6 6 6-6" /></svg>
+        </button>
+      ) : (
+        <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 16, padding: 8, boxShadow: 'var(--sh-3)', display: 'flex', flexDirection: 'column', minWidth: 320 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px' }}>
+            <span className="mono" style={{ fontSize: 11, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '.08em' }}>9 экранов</span>
+            <button onClick={() => setNavOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-3)', fontSize: 18 }}>×</button>
+          </div>
+          {SCREENS.map((s) => (
+            <button key={s.id} onClick={() => { nav(s.id); setNavOpen(false); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', background: route === s.id ? 'var(--bg-2)' : 'transparent', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: route === s.id ? 600 : 400, color: 'var(--ink)', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
+              <span className="mono" style={{ fontSize: 11, color: 'var(--ink-4)', minWidth: 22 }}>{s.n}</span>
+              {s.label}
+              {route === s.id && <span style={{ marginLeft: 'auto', color: 'var(--brand)', fontSize: 11 }}>● текущий</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // Tweaks panel — components from tweaks-panel.jsx are on window globally
+  const TweaksUI = () => {
+    if (!editMode || !window.TweaksPanel) return null;
+    const TP = window.TweaksPanel, TS = window.TweakSection, TSL = window.TweakSlider, TR = window.TweakRadio;
+    return (
+      <TP onClose={() => { setEditMode(false); window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); }}>
+        <TS label="Бренд" />
+        <TSL label="Hue" value={tweaks.primaryHue} min={0} max={360} step={1} onChange={(v) => setTweak('primaryHue', v)} />
+        <div style={{ display: 'flex', gap: 6, padding: '4px 12px 12px' }}>
+          {[252, 230, 14, 28, 142, 320].map((h) => (
+            <button key={h} onClick={() => setTweak('primaryHue', h)} style={{ width: 26, height: 26, borderRadius: 50, background: `oklch(0.58 0.22 ${h})`, border: tweaks.primaryHue === h ? '2px solid #000' : '1px solid #ccc', cursor: 'pointer', padding: 0 }} />
+          ))}
+        </div>
+        <TS label="Плотность" />
+        <TR label="Density" value={tweaks.density} options={['comfort', 'compact']} onChange={(v) => setTweak('density', v)} />
+        <TS label="Hero лендинга" />
+        <TR label="Variant" value={tweaks.heroVariant} options={['editorial', 'split']} onChange={(v) => setTweak('heroVariant', v)} />
+      </TP>
+    );
+  };
+
+  return (
+    <div data-screen-label={`${SCREENS.find(s => s.id === route)?.n} ${SCREENS.find(s => s.id === route)?.label}`}>
+      <Comp onNav={nav} />
+      <ScreenSwitcher />
+      <TweaksUI />
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
+<!-- commit 27: chore: add score check note for CI -->
