@@ -1,0 +1,555 @@
+{
+  "uid": "admin",
+  "title": "MAYSS Admin Analytics",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 3,
+  "refresh": "1m",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "GMV всего",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "GMV за 30 дней",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') AND created_at >= now() - interval '30 days'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "GMV сегодня",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') AND created_at::date = current_date",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Доход платформы (5%)",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total) * 0.05, 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Средний чек",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(round(avg(total)::numeric, 2), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Всего заказов",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM orders",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Отменено %",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(100.0 * count(*) FILTER (WHERE lower(status::text) = 'cancelled') / NULLIF(count(*), 0), 2) AS value FROM orders",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Возвратов %",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(100.0 * count(*) FILTER (WHERE lower(status::text) = 'returned') / NULLIF(count(*), 0), 2) AS value FROM orders",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Доставлено",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM orders WHERE lower(status::text) = 'delivered'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "В пути",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM orders WHERE lower(status::text) IN ('paid','assembling','shipped')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Товары на модерации",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM products WHERE lower(status::text) = 'pending'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Среднее время доставки, ч",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(avg(EXTRACT(EPOCH FROM (delivered_at - shipped_at)) / 3600)::numeric, 2) AS value FROM orders WHERE lower(status::text) = 'delivered' AND shipped_at IS NOT NULL AND delivered_at IS NOT NULL",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "GMV по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", sum(total) AS \"GMV\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Доход платформы по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", round((sum(total) * 0.05)::numeric, 2) AS \"Доход\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Заказов по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", count(*) AS \"Заказы\" FROM orders GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Средний чек по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", round(avg(total)::numeric, 2) AS \"AOV\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Статусы заказов",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT CASE lower(status::text) WHEN 'created' THEN 'Создан' WHEN 'paid' THEN 'Оплачен' WHEN 'assembling' THEN 'Сборка' WHEN 'shipped' THEN 'Отправлен' WHEN 'delivered' THEN 'Доставлен' WHEN 'cancelled' THEN 'Отменён' WHEN 'returned' THEN 'Возврат' ELSE status::text END AS \"Статус\", count(*) AS \"Количество\" FROM orders GROUP BY 1 ORDER BY 2 DESC",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Товары по статусу",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT CASE lower(status::text) WHEN 'draft' THEN 'Черновик' WHEN 'pending' THEN 'На модерации' WHEN 'active' THEN 'Активен' WHEN 'rejected' THEN 'Отклонён' WHEN 'archived' THEN 'Архив' ELSE status::text END AS \"Статус\", count(*) AS \"Количество\" FROM products GROUP BY 1 ORDER BY 2 DESC",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "GMV по категориям",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT c.name AS \"Категория\", round(sum(oi.price * oi.quantity)::numeric, 2) AS \"GMV\" FROM order_items oi JOIN orders o ON o.id = oi.order_id JOIN products p ON p.id = oi.product_id JOIN categories c ON c.id = p.category_id WHERE lower(o.status::text) NOT IN ('created','cancelled') GROUP BY c.name ORDER BY 2 DESC",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Топ магазинов по обороту",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT sp.shop_name AS \"Магазин\", round(sum(o.total)::numeric, 2) AS \"Оборот\" FROM orders o JOIN seller_profiles sp ON sp.id = o.seller_id WHERE lower(o.status::text) NOT IN ('created','cancelled') GROUP BY sp.shop_name ORDER BY 2 DESC LIMIT 10",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Топ товаров по продажам (шт)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT oi.title AS \"Товар\", sum(oi.quantity) AS \"Продано\" FROM order_items oi JOIN orders o ON o.id = oi.order_id WHERE lower(o.status::text) NOT IN ('created','cancelled') GROUP BY oi.title ORDER BY 2 DESC LIMIT 10",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Новые пользователи по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", count(*) AS \"Users\" FROM users GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Средняя скорость доставки по магазинам (часы)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT sp.shop_name AS \"Магазин\", count(*) AS \"Доставлено\", round(avg(EXTRACT(EPOCH FROM (o.delivered_at - o.shipped_at)) / 3600)::numeric, 2) AS \"Среднее время, ч\" FROM orders o JOIN seller_profiles sp ON sp.id = o.seller_id WHERE lower(o.status::text) = 'delivered' AND o.shipped_at IS NOT NULL AND o.delivered_at IS NOT NULL GROUP BY sp.shop_name ORDER BY 3 ASC",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Заказы за последние 24 часа",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT o.id AS \"#\", o.created_at AS \"Создан\", u.email AS \"Покупатель\", sp.shop_name AS \"Магазин\", o.status::text AS \"Статус\", o.total AS \"Сумма\" FROM orders o JOIN users u ON u.id = o.buyer_id JOIN seller_profiles sp ON sp.id = o.seller_id WHERE o.created_at >= now() - interval '24 hours' ORDER BY o.created_at DESC LIMIT 50",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Отказные заказы (cancelled/returned)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT o.id AS \"#\", o.created_at AS \"Создан\", u.email AS \"Покупатель\", o.status::text AS \"Статус\", o.total AS \"Сумма\" FROM orders o JOIN users u ON u.id = o.buyer_id WHERE lower(o.status::text) IN ('cancelled','returned') ORDER BY o.created_at DESC LIMIT 50",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

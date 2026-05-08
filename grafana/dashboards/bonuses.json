@@ -1,0 +1,484 @@
+{
+  "uid": "bonuses",
+  "title": "MAYSS Bonuses & Rewards",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 2,
+  "refresh": "1m",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Выдано бонусов",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(amount), 0) AS value FROM bonus_transactions WHERE lower(tx_type::text) = 'earn'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Бонусов потрачено",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(amount), 0) AS value FROM bonus_transactions WHERE lower(tx_type::text) = 'spend'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Бонусные корректировки",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(amount), 0) AS value FROM bonus_transactions WHERE lower(tx_type::text) = 'adjust'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Текущая ликвидность",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(balance), 0) AS value FROM bonus_wallets",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Активных кошельков",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM bonus_wallets WHERE balance > 0",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Средний баланс",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(round(avg(balance)::numeric, 2), 0) AS value FROM bonus_wallets WHERE balance > 0",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Доля потраченного %",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(100.0 * COALESCE(sum(amount) FILTER (WHERE lower(tx_type::text) = 'spend'), 0) / NULLIF(sum(amount) FILTER (WHERE lower(tx_type::text) = 'earn'), 0), 2) AS value FROM bonus_transactions",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Транзакций всего",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM bonus_transactions",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Заказов с бонусами",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM orders WHERE bonus_spent > 0",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Бонусов в заказах",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(bonus_spent), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Макс. баланс",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(max(balance), 0) AS value FROM bonus_wallets",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Пользователей без кошелька",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM users u LEFT JOIN bonus_wallets bw ON bw.user_id = u.id WHERE lower(u.role::text) = 'buyer' AND bw.id IS NULL",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Начисления по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", sum(amount) AS \"Начислено\" FROM bonus_transactions WHERE lower(tx_type::text) = 'earn' GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Траты по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", sum(amount) AS \"Потрачено\" FROM bonus_transactions WHERE lower(tx_type::text) = 'spend' GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Накопительная ликвидность",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT day AS \"time\", sum(net) OVER (ORDER BY day) AS \"Ликвидность\" FROM (SELECT date_trunc('day', created_at) AS day, sum(CASE WHEN tx_type = 'earn' THEN amount WHEN tx_type = 'spend' THEN -amount ELSE amount END) AS net FROM bonus_transactions GROUP BY 1) t ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Количество транзакций по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", count(*) AS \"Транзакций\" FROM bonus_transactions GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Распределение по типам транзакций",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT CASE lower(tx_type::text) WHEN 'earn' THEN 'Начисление' WHEN 'spend' THEN 'Списание' WHEN 'adjust' THEN 'Корректировка' ELSE tx_type::text END AS \"Тип\", count(*) AS \"Количество\" FROM bonus_transactions GROUP BY 1",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Распределение балансов кошельков",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT CASE WHEN balance = 0 THEN 'Пусто' WHEN balance < 100 THEN '1-100' WHEN balance < 500 THEN '100-500' WHEN balance < 1000 THEN '500-1000' ELSE '1000+' END AS \"Корзина\", count(*) AS \"Кошельков\" FROM bonus_wallets GROUP BY 1",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Топ транзакций по сумме",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT u.email AS \"Email\", bt.amount AS \"Сумма\" FROM bonus_transactions bt JOIN bonus_wallets bw ON bw.id = bt.wallet_id JOIN users u ON u.id = bw.user_id ORDER BY bt.amount DESC LIMIT 10",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Топ кошельков по балансу",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT u.email AS \"Email\", bw.balance AS \"Баланс\", bw.updated_at AS \"Обновлён\" FROM bonus_wallets bw JOIN users u ON u.id = bw.user_id ORDER BY bw.balance DESC LIMIT 15",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Последние транзакции",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT bt.created_at AS \"Когда\", u.email AS \"Email\", bt.amount AS \"Сумма\", bt.tx_type::text AS \"Тип\", bt.description AS \"Описание\" FROM bonus_transactions bt JOIN bonus_wallets bw ON bw.id = bt.wallet_id JOIN users u ON u.id = bw.user_id ORDER BY bt.created_at DESC LIMIT 20",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
