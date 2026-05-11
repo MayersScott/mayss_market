@@ -1,0 +1,513 @@
+{
+  "uid": "users",
+  "title": "MAYSS Users & Conversion",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 3,
+  "refresh": "1m",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Всего пользователей",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM users",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Покупателей",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM users WHERE lower(role::text) = 'buyer'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Продавцов",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM seller_profiles",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Товаров в каталоге",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM products WHERE lower(status::text) = 'active'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Активных за 30 дней",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(DISTINCT buyer_id) AS value FROM orders WHERE created_at >= now() - interval '30 days'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Активных за 7 дней",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(DISTINCT buyer_id) AS value FROM orders WHERE created_at >= now() - interval '7 days'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Заблокированных",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM users WHERE is_active = false",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Доля сделавших заказ %",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(100.0 * count(DISTINCT o.buyer_id) / NULLIF(count(DISTINCT u.id), 0), 2) AS value FROM users u LEFT JOIN orders o ON o.buyer_id = u.id WHERE lower(u.role::text) = 'buyer'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Повторных покупателей",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM (SELECT buyer_id FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY buyer_id HAVING count(*) > 1) sub",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Среднее заказов на пользователя",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(count(*)::numeric / NULLIF(count(DISTINCT buyer_id), 0), 2) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Подписок на push",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM push_subscriptions",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Привязан Telegram",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM users WHERE telegram_chat_id IS NOT NULL",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Рост пользователей по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", count(*) AS \"Новых пользователей\" FROM users GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Накопительный рост базы",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT day AS \"time\", sum(cnt) OVER (ORDER BY day) AS \"Всего пользователей\" FROM (SELECT date_trunc('day', created_at) AS day, count(*) AS cnt FROM users GROUP BY 1) t ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "DAU (уникальные покупатели по дням)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", count(DISTINCT buyer_id) AS \"DAU\" FROM orders GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Конверсия (регистрация → первый заказ) %",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', u.created_at) AS \"time\", round(100.0 * count(DISTINCT o.buyer_id) / NULLIF(count(DISTINCT u.id), 0), 2) AS \"Конверсия %\" FROM users u LEFT JOIN orders o ON o.buyer_id = u.id AND o.created_at >= u.created_at WHERE lower(u.role::text) = 'buyer' GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Пользователи по ролям",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT CASE lower(role::text) WHEN 'buyer' THEN 'Покупатели' WHEN 'seller' THEN 'Продавцы' WHEN 'admin' THEN 'Админы' ELSE role::text END AS \"Роль\", count(*) AS \"Количество\" FROM users GROUP BY 1",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Регистрации по дням недели",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT to_char(created_at, 'Day') AS \"День\", count(*) AS \"Регистраций\" FROM users GROUP BY 1, EXTRACT(DOW FROM created_at) ORDER BY EXTRACT(DOW FROM created_at)",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Регистрации по часам",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT EXTRACT(HOUR FROM created_at)::int AS \"Час\", count(*) AS \"Регистраций\" FROM users GROUP BY 1 ORDER BY 1",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Топ покупателей по сумме",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT u.email AS \"Email\", count(o.id) AS \"Заказов\", round(sum(o.total)::numeric, 2) AS \"Сумма\" FROM users u JOIN orders o ON o.buyer_id = u.id WHERE lower(o.status::text) NOT IN ('created','cancelled') GROUP BY u.id, u.email ORDER BY 3 DESC LIMIT 20",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "VIP пользователи (>3 заказов)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT u.email AS \"Email\", count(o.id) AS \"Заказов\", round(sum(o.total)::numeric, 2) AS \"Сумма\", round(avg(o.total)::numeric, 2) AS \"Средний чек\" FROM users u JOIN orders o ON o.buyer_id = u.id WHERE lower(o.status::text) NOT IN ('created','cancelled') GROUP BY u.id, u.email HAVING count(o.id) > 3 ORDER BY 3 DESC LIMIT 20",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Неактивные пользователи (без заказов)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT u.email AS \"Email\", u.created_at AS \"Зарегистрирован\", EXTRACT(DAY FROM now() - u.created_at)::int AS \"Дней с регистрации\" FROM users u LEFT JOIN orders o ON o.buyer_id = u.id WHERE lower(u.role::text) = 'buyer' AND o.id IS NULL ORDER BY u.created_at DESC LIMIT 30",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Когорты по месяцу регистрации",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT to_char(date_trunc('month', u.created_at), 'YYYY-MM') AS \"Когорта\", count(DISTINCT u.id) AS \"Регистраций\", count(DISTINCT o.buyer_id) AS \"Купивших\", round(100.0 * count(DISTINCT o.buyer_id) / NULLIF(count(DISTINCT u.id), 0), 2) AS \"Конверсия %\" FROM users u LEFT JOIN orders o ON o.buyer_id = u.id AND lower(o.status::text) NOT IN ('created','cancelled') WHERE lower(u.role::text) = 'buyer' GROUP BY 1 ORDER BY 1 DESC",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

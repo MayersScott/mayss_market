@@ -1,0 +1,521 @@
+{
+  "uid": "payments",
+  "title": "MAYSS Payments & Revenue",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 2,
+  "refresh": "1m",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Выручка всего",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Выручка сегодня",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') AND created_at::date = current_date",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Выручка за 7 дней",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') AND created_at >= now() - interval '7 days'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Комиссия 5%",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total) * 0.05, 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Завершено платежей",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM payments WHERE lower(status::text) = 'completed'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Сумма возвратов",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(total), 0) AS value FROM orders WHERE lower(status::text) = 'returned'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Платежей в ожидании",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM payments WHERE lower(status::text) = 'pending'",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Скидки промокодами",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(promo_discount), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Бонусов в оплате",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(sum(bonus_spent), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Заказов с промокодом",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS value FROM orders WHERE promo_code IS NOT NULL",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Средний чек",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT COALESCE(round(avg(total)::numeric, 2), 0) AS value FROM orders WHERE lower(status::text) NOT IN ('created','cancelled')",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "currencyRUB"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Возвратов %",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 4
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT round(100.0 * count(*) FILTER (WHERE lower(status::text) = 'returned') / NULLIF(count(*) FILTER (WHERE lower(status::text) IN ('delivered','returned')), 0), 2) AS value FROM orders",
+          "format": "table",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Динамика выручки",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", round(sum(total)::numeric, 2) AS \"Выручка\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Конверсия в оплату по дням %",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", round(100.0 * count(*) FILTER (WHERE lower(status::text) NOT IN ('created','cancelled')) / NULLIF(count(*), 0), 2) AS \"Конверсия %\" FROM orders GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Платежи по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", count(*) AS \"Платежей\", round(sum(amount)::numeric, 2) AS \"Сумма\" FROM payments WHERE lower(status::text) = 'completed' GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Скидки и бонусы по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"time\", sum(promo_discount) AS \"Промо\", sum(bonus_spent) AS \"Бонусы\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Распределение по статусам заказов",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT CASE lower(status::text) WHEN 'created' THEN 'На оплате' WHEN 'paid' THEN 'Оплачен' WHEN 'cancelled' THEN 'Отменён' WHEN 'returned' THEN 'Возврат' WHEN 'delivered' THEN 'Доставлен' ELSE 'В процессе' END AS \"Статус\", count(*) AS \"Количество\" FROM orders GROUP BY 1",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Метод оплаты",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT method AS \"Метод\", count(*) AS \"Количество\" FROM payments GROUP BY method ORDER BY 2 DESC",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "Статус платежей",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT status AS \"Статус\", count(*) AS \"Количество\" FROM payments GROUP BY status",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Использование промокодов",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT promo_code AS \"Промо\", count(*) AS \"Использований\", round(sum(promo_discount)::numeric, 2) AS \"Сумма скидки\" FROM orders WHERE promo_code IS NOT NULL GROUP BY promo_code ORDER BY 2 DESC LIMIT 10",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "barchart",
+      "title": "Выручка по часам",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT EXTRACT(HOUR FROM created_at)::int AS \"Час\", round(sum(total)::numeric, 2) AS \"Сумма\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Средний чек по дням",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT date_trunc('day', created_at) AS \"Дата\", count(*) AS \"Заказов\", round(avg(total)::numeric, 2) AS \"AOV\", round(sum(total)::numeric, 2) AS \"Итого\" FROM orders WHERE lower(status::text) NOT IN ('created','cancelled') GROUP BY 1 ORDER BY 1 DESC LIMIT 30",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Дубликат-проверка по idempotency",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
+      "datasource": "PostgreSQL",
+      "targets": [
+        {
+          "rawSql": "SELECT idempotency_key AS \"Ключ\", count(*) AS \"Записей\", string_agg(DISTINCT status, ', ') AS \"Статусы\" FROM payments GROUP BY idempotency_key HAVING count(*) > 1 ORDER BY 2 DESC LIMIT 20",
+          "format": "table",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
