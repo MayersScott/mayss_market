@@ -64,6 +64,11 @@ jobs:
               git reset --hard origin/${{ github.ref_name }}
             fi
             
+            # Создаём .env если его нет (копируем из примера)
+            if [ ! -f ".env" ]; then
+              cp .env.example .env
+            fi
+            
             # Пересобираем и запускаем контейнеры в фоне
             docker compose down
             docker compose up -d --build

@@ -4983,3 +4983,10 @@ Check your internet connection or see how to run the library in offline mode at 
 2026-05-27 10:31:26 | INFO     | mayss | RES | IP: 151.101.0.223 | GET /api/v1/cards | Status: 200 | Time: 116.42ms
 2026-05-27 10:31:26 | INFO     | mayss | RES | IP: 151.101.0.223 | GET /api/v1/support/tickets | Status: 200 | Time: 67.95ms
 2026-05-27 10:31:26 | INFO     | mayss | RES | IP: 151.101.0.223 | GET /api/v1/addresses | Status: 200 | Time: 140.39ms
+2026-05-27 14:36:10 | INFO     | app.core.logger | Система логирования инициализирована. Debug режим: False
+2026-05-27 14:36:10 | INFO     | mayss | Starting MAYSS Marketplace API
+2026-05-27 14:36:11 | INFO     | mayss | Database initialized successfully
+2026-05-27 14:36:11 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.086s]
+2026-05-27 14:36:11 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/mayss_products [status:200 duration:0.043s]
+2026-05-27 14:36:12 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_count [status:200 duration:0.323s]
+2026-05-27 14:36:12 | INFO     | mayss | ES index already has 303 documents
