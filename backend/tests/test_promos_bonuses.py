@@ -168,4 +168,7 @@ def test_push_key_without_vapid_returns_503(client):
 def test_bonus_transactions_empty(client, buyer_headers):
     r = client.get("/api/v1/bonuses/transactions", headers=buyer_headers)
     assert r.status_code == 200
-    assert isinstance(r.json(), list)
+    data = r.json()
+    assert isinstance(data, dict)
+    assert isinstance(data.get("items"), list)
+    assert data.get("total") == 0
