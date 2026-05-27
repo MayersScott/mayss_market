@@ -51,11 +51,9 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            # Переходим в папку проекта (измените путь /var/www/marketplace на ваш актуальный)
             mkdir -p /var/www/marketplace
             cd /var/www/marketplace
             
-            # Если репозиторий еще не склонирован на сервере, инициализируем
             if [ ! -d ".git" ]; then
               git clone https://github.com/${{ github.repository }}.git .
             else
@@ -63,14 +61,19 @@ jobs:
               git reset --hard origin/${{ github.ref_name }}
             fi
             
-            # Создаём .env если его нет (копируем из примера)
             if [ ! -f ".env" ]; then
               cp .env.example .env
             fi
             
-            # Пересобираем и запускаем контейнеры в фоне
+            # 1. Тушим старый маркетплейс, освобождаем память
             docker compose down
+            
+            # 2. ЖЕСТКО ЧИСТИМ КЭШ СБОРКИ ДО НАЧАЛА НОВОЙ СБОРКИ
+            # Это удалит те самые 6 ГБ кэша, но сохранит работающего VPN-бота
+            docker builder prune -a -f
+            
+            # 3. Собираем и поднимаем новую версию
             docker compose up -d --build
             
-            # Очищаем неиспользуемые старые слои и образы, чтобы диск не забивался
-            docker image prune -f
+            # 4. Чистим старые образы бэкенда, которые остались после замены
+            docker system prune -f

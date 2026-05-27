@@ -20,21 +20,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
     env_file:
       - .env
-
     environment:
       DATABASE_URL: postgresql+psycopg2://mayss:mayss@db:5432/mayss
       SECRET_KEY: dev-secret-change-me
       PUBLIC_BASE_URL: https://mayersscott.ru
-
     ports:
       - "8001:8000"
-
-    volumes:
-      - ./backend:/app
-
+    # В продакшене лучше убрать volumes для кода бэкенда, 
+    # чтобы контейнер использовал код, который вшит в него при сборке.
+    # volumes:
+    #   - ./backend:/app 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     command: sh entrypoint.sh
 
   frontend:
