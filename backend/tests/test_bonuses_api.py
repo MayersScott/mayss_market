@@ -57,13 +57,13 @@ def admin_user(db_session):
 @pytest.fixture
 def test_token(test_user):
     """Create JWT token for test user."""
-    return create_access_token(data={"sub": str(test_user.id)})
+    return create_access_token(subject=str(test_user.id))
 
 
 @pytest.fixture
 def admin_token(admin_user):
     """Create JWT token for admin user."""
-    return create_access_token(data={"sub": str(admin_user.id)})
+    return create_access_token(subject=str(admin_user.id))
 
 
 @pytest.fixture
