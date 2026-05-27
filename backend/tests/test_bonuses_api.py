@@ -13,10 +13,13 @@ from app.core.security import create_access_token
 def db_session():
     """Create test database session."""
     Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
+    connection = engine.connect()
+    transaction = connection.begin()
+    db = SessionLocal(bind=connection)
     yield db
     db.close()
-    Base.metadata.drop_all(bind=engine)
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture
@@ -24,7 +27,7 @@ def test_user(db_session):
     """Create test user."""
     user = User(
         email="test@example.com",
-        hashed_password="hashedpassword",
+        password_hash="hashedpassword",
         is_active=True,
         role=UserRole.BUYER,
     )
@@ -39,7 +42,7 @@ def admin_user(db_session):
     """Create admin user."""
     user = User(
         email="admin@example.com",
-        hashed_password="hashedpassword",
+        password_hash="hashedpassword",
         is_active=True,
         role=UserRole.ADMIN,
     )
@@ -74,7 +77,7 @@ class TestBonusBalanceEndpoint:
         """Test accessing balance without authentication."""
         response = client.get("/api/v1/bonuses/balance")
         
-        assert response.status_code == 403
+        assert response.status_code == 401
 
     def test_get_balance_authorized(self, client: TestClient, test_token: str, test_user: User):
         """Test getting balance when authenticated."""

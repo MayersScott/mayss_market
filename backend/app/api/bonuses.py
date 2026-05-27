@@ -3,7 +3,7 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.api.deps import get_db, require_admin, get_current_user
 from app.schemas.bonuses import (
     AdjustBonusesRequest,
     BonusTransactionsListResponse,
@@ -74,14 +74,10 @@ def get_user_transactions(
 @router.post("/admin/adjust")
 def admin_adjust_bonuses(
     request: AdjustBonusesRequest,
-    current_user = Depends(get_current_user),
+    current_user = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
     """Admin endpoint to adjust user bonuses."""
-    # Check if user is admin
-    if not hasattr(current_user, "is_admin") or not current_user.is_admin:
-        raise HTTPException(status_code=403, detail="Only admins can adjust bonuses")
-    
     new_balance = adjust_balance(
         db,
         request.user_id,
