@@ -1,4 +1,3 @@
-"""Telegram bot command handlers for MAYSS"""
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 

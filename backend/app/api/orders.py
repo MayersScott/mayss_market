@@ -164,7 +164,6 @@ def confirm_pickup(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Confirm order receipt via pickup code."""
     from app.services.bonus_service import earn_for_delivered_order
     from app.services.notifier import notify_user_order_status
 

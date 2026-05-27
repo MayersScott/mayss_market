@@ -3,7 +3,7 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_admin, get_current_user
+from app.api.deps import get_current_user, get_db
 from app.schemas.bonuses import (
     AdjustBonusesRequest,
     BonusTransactionsListResponse,
@@ -28,7 +28,6 @@ def get_user_balance(
     current_user = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Get current user's bonus balance."""
     from app.models.promotions import BonusWallet
     wallet = db.query(BonusWallet).filter(BonusWallet.user_id == current_user.id).first()
     if not wallet:
@@ -48,7 +47,6 @@ def get_user_stats(
     current_user = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Get user's bonus wallet statistics."""
     stats = get_wallet_stats(db, current_user.id)
     return BonusWalletStatsResponse(**stats)
 
@@ -61,7 +59,6 @@ def get_user_transactions(
     offset: int = Query(0, ge=0),
     tx_type: str | None = Query(None),
 ):
-    """Get user's bonus transactions with pagination."""
     transactions, total = get_transactions(db, current_user.id, limit, offset, tx_type)
     return BonusTransactionsListResponse(
         items=[BonusTransactionResponse.from_orm(t) for t in transactions],
@@ -74,10 +71,12 @@ def get_user_transactions(
 @router.post("/admin/adjust")
 def admin_adjust_bonuses(
     request: AdjustBonusesRequest,
-    current_user = Depends(require_admin),
+    current_user = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Admin endpoint to adjust user bonuses."""
+    if not hasattr(current_user, "is_admin") or not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Only admins can adjust bonuses")
+    
     new_balance = adjust_balance(
         db,
         request.user_id,

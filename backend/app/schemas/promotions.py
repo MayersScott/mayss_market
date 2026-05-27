@@ -1,4 +1,3 @@
-"""Schemas for promos and bonuses."""
 from datetime import datetime
 from decimal import Decimal
 

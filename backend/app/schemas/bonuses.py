@@ -1,4 +1,3 @@
-"""Pydantic schemas for bonuses and rewards."""
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum as PyEnum

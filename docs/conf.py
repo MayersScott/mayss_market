@@ -1,4 +1,3 @@
-"""Sphinx configuration for MAYSS."""
 import os
 import sys
 

@@ -113,7 +113,6 @@ class CartItemOut(BaseModel):
 
 
 class CartSummary(BaseModel):
-    """Cart summary with pricing breakdown."""
     subtotal: Decimal = Field(..., decimal_places=2)
     available_bonuses: Decimal = Field(default=Decimal("0"), decimal_places=2)
     max_bonus_discount: Decimal = Field(default=Decimal("0"), decimal_places=2)
@@ -123,7 +122,6 @@ class CartSummary(BaseModel):
 
 
 class CartOut(BaseModel):
-    """Full cart response with items and summary."""
     items: list[CartItemOut]
     subtotal: Decimal = Field(..., decimal_places=2)
     available_bonuses: Decimal = Field(default=Decimal("0"), decimal_places=2)

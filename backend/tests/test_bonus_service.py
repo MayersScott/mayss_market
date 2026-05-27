@@ -18,7 +18,6 @@ from app.services.bonus_service import (
 
 @pytest.fixture
 def db_session():
-    """Create an in-memory SQLite database for testing."""
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
@@ -29,15 +28,11 @@ def db_session():
 
 @pytest.fixture
 def sample_user_id():
-    """Sample user ID for testing."""
     return 1
 
 
 class TestBonusWallet:
-    """Tests for bonus wallet management."""
-
     def test_get_or_create_wallet_new(self, db_session: Session, sample_user_id: int):
-        """Test creating a new bonus wallet."""
         wallet = get_or_create_wallet(db_session, sample_user_id)
         
         assert wallet is not None
@@ -45,7 +40,6 @@ class TestBonusWallet:
         assert wallet.balance == Decimal("0")
 
     def test_get_or_create_wallet_existing(self, db_session: Session, sample_user_id: int):
-        """Test getting existing wallet."""
         wallet1 = get_or_create_wallet(db_session, sample_user_id)
         wallet1.balance = Decimal("100")
         db_session.commit()
@@ -56,7 +50,6 @@ class TestBonusWallet:
         assert wallet2.balance == Decimal("100")
 
     def test_get_balance(self, db_session: Session, sample_user_id: int):
-        """Test getting wallet balance."""
         wallet = get_or_create_wallet(db_session, sample_user_id)
         wallet.balance = Decimal("250.50")
         db_session.commit()
@@ -67,10 +60,8 @@ class TestBonusWallet:
 
 
 class TestBonusEarning:
-    """Tests for earning bonuses."""
 
     def test_earn_for_delivered_order(self, db_session: Session, sample_user_id: int):
-        """Test earning bonuses for delivered order."""
         order_id = 42
         order_total = Decimal("1000.00")
         
@@ -83,7 +74,6 @@ class TestBonusEarning:
         assert get_balance(db_session, sample_user_id) == Decimal("30.00")
 
     def test_earn_with_custom_percent(self, db_session: Session, sample_user_id: int):
-        """Test earning with custom percentage."""
         earned = earn_for_delivered_order(
             db_session,
             sample_user_id,
@@ -95,7 +85,6 @@ class TestBonusEarning:
         assert earned == Decimal("50.00")
 
     def test_earn_creates_transaction(self, db_session: Session, sample_user_id: int):
-        """Test that earning creates a transaction record."""
         earn_for_delivered_order(
             db_session, sample_user_id, 42, Decimal("1000.00")
         )
@@ -108,7 +97,6 @@ class TestBonusEarning:
         assert transactions[0].order_id == 42
 
     def test_earn_small_amount_skipped(self, db_session: Session, sample_user_id: int):
-        """Test that very small earnings are skipped."""
         earned = earn_for_delivered_order(
             db_session, sample_user_id, 42, Decimal("0.10")
         )
@@ -118,16 +106,12 @@ class TestBonusEarning:
 
 
 class TestBonusSpending:
-    """Tests for spending bonuses."""
 
     def test_spend_on_order(self, db_session: Session, sample_user_id: int):
-        """Test spending bonuses on order."""
-        # Setup: create wallet with balance
         wallet = get_or_create_wallet(db_session, sample_user_id)
         wallet.balance = Decimal("100.00")
         db_session.commit()
         
-        # Spend bonuses
         spent = spend_on_order(
             db_session,
             sample_user_id,
@@ -141,7 +125,6 @@ class TestBonusSpending:
         assert get_balance(db_session, sample_user_id) == Decimal("50.00")
 
     def test_spend_capped_at_50_percent(self, db_session: Session, sample_user_id: int):
-        """Test that spending is capped at 50% of order."""
         wallet = get_or_create_wallet(db_session, sample_user_id)
         wallet.balance = Decimal("10000.00")
         db_session.commit()
@@ -150,14 +133,13 @@ class TestBonusSpending:
             db_session,
             sample_user_id,
             order_id=42,
-            amount=Decimal("1000.00"),  # More than 50%
+            amount=Decimal("1000.00"),
             order_subtotal=Decimal("1000.00"),
         )
         
-        assert spent == Decimal("500.00")  # Only 50%
+        assert spent == Decimal("500.00")
 
     def test_spend_insufficient_balance(self, db_session: Session, sample_user_id: int):
-        """Test error when insufficient balance."""
         wallet = get_or_create_wallet(db_session, sample_user_id)
         wallet.balance = Decimal("10.00")
         db_session.commit()
@@ -172,7 +154,6 @@ class TestBonusSpending:
             )
 
     def test_spend_zero_amount(self, db_session: Session, sample_user_id: int):
-        """Test spending zero amount returns 0."""
         spent = spend_on_order(
             db_session,
             sample_user_id,
@@ -184,7 +165,6 @@ class TestBonusSpending:
         assert spent == Decimal("0")
 
     def test_spend_creates_transaction(self, db_session: Session, sample_user_id: int):
-        """Test that spending creates a transaction record."""
         wallet = get_or_create_wallet(db_session, sample_user_id)
         wallet.balance = Decimal("100.00")
         db_session.commit()
@@ -201,10 +181,7 @@ class TestBonusSpending:
 
 
 class TestBonusAdjustment:
-    """Tests for manual balance adjustments."""
-
     def test_adjust_positive(self, db_session: Session, sample_user_id: int):
-        """Test positive adjustment."""
         new_balance = adjust_balance(
             db_session,
             sample_user_id,
@@ -217,7 +194,6 @@ class TestBonusAdjustment:
         assert get_balance(db_session, sample_user_id) == Decimal("100.00")
 
     def test_adjust_negative(self, db_session: Session, sample_user_id: int):
-        """Test negative adjustment."""
         wallet = get_or_create_wallet(db_session, sample_user_id)
         wallet.balance = Decimal("100.00")
         db_session.commit()
@@ -232,7 +208,6 @@ class TestBonusAdjustment:
         assert new_balance == Decimal("50.00")
 
     def test_adjust_clamps_to_zero(self, db_session: Session, sample_user_id: int):
-        """Test that balance is clamped to 0."""
         adjust_balance(
             db_session,
             sample_user_id,
@@ -246,10 +221,8 @@ class TestBonusAdjustment:
 
 
 class TestBonusTransactions:
-    """Tests for transaction history."""
 
     def test_get_transactions(self, db_session: Session, sample_user_id: int):
-        """Test retrieving transactions."""
         earn_for_delivered_order(db_session, sample_user_id, 1, Decimal("1000"))
         earn_for_delivered_order(db_session, sample_user_id, 2, Decimal("500"))
         db_session.commit()
@@ -260,7 +233,6 @@ class TestBonusTransactions:
         assert len(transactions) == 2
 
     def test_get_transactions_with_type_filter(self, db_session: Session, sample_user_id: int):
-        """Test filtering transactions by type."""
         earn_for_delivered_order(db_session, sample_user_id, 1, Decimal("1000"))
         
         wallet = get_or_create_wallet(db_session, sample_user_id)
@@ -275,7 +247,6 @@ class TestBonusTransactions:
         assert spend_count == 1
 
     def test_get_transactions_pagination(self, db_session: Session, sample_user_id: int):
-        """Test transaction pagination."""
         for i in range(100):
             earn_for_delivered_order(db_session, sample_user_id, i, Decimal("100"))
         db_session.commit()
@@ -290,10 +261,8 @@ class TestBonusTransactions:
 
 
 class TestBonusStats:
-    """Tests for wallet statistics."""
 
     def test_get_wallet_stats(self, db_session: Session, sample_user_id: int):
-        """Test getting wallet statistics."""
         earn_for_delivered_order(db_session, sample_user_id, 1, Decimal("1000"))
         
         wallet = get_or_create_wallet(db_session, sample_user_id)

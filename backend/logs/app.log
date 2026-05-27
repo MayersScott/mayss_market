@@ -4983,10 +4983,62 @@ Check your internet connection or see how to run the library in offline mode at 
 2026-05-27 10:31:26 | INFO     | mayss | RES | IP: 151.101.0.223 | GET /api/v1/cards | Status: 200 | Time: 116.42ms
 2026-05-27 10:31:26 | INFO     | mayss | RES | IP: 151.101.0.223 | GET /api/v1/support/tickets | Status: 200 | Time: 67.95ms
 2026-05-27 10:31:26 | INFO     | mayss | RES | IP: 151.101.0.223 | GET /api/v1/addresses | Status: 200 | Time: 140.39ms
-2026-05-27 14:36:10 | INFO     | app.core.logger | Система логирования инициализирована. Debug режим: False
-2026-05-27 14:36:10 | INFO     | mayss | Starting MAYSS Marketplace API
-2026-05-27 14:36:11 | INFO     | mayss | Database initialized successfully
-2026-05-27 14:36:11 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.086s]
-2026-05-27 14:36:11 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/mayss_products [status:200 duration:0.043s]
-2026-05-27 14:36:12 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_count [status:200 duration:0.323s]
-2026-05-27 14:36:12 | INFO     | mayss | ES index already has 303 documents
+2026-05-27 22:55:39 | INFO     | app.core.logger | Система логирования инициализирована. Debug режим: False
+2026-05-27 22:55:39 | INFO     | mayss | Starting MAYSS Marketplace API
+2026-05-27 22:55:39 | INFO     | mayss | Database initialized successfully
+2026-05-27 22:55:39 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.040s]
+2026-05-27 22:55:39 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/mayss_products [status:200 duration:0.025s]
+2026-05-27 22:55:39 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_count [status:200 duration:0.065s]
+2026-05-27 22:55:39 | INFO     | mayss | ES index already has 303 documents
+2026-05-27 22:55:40 | INFO     | mayss | RES | IP: 192.168.65.1 | GET / | Status: 200 | Time: 6.67ms
+2026-05-27 22:55:41 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /favicon.ico | Status: 404 | Time: 3.72ms
+2026-05-27 22:56:21 | INFO     | app.core.logger | Система логирования инициализирована. Debug режим: False
+2026-05-27 22:56:21 | INFO     | mayss | Starting MAYSS Marketplace API
+2026-05-27 22:56:21 | INFO     | mayss | Database initialized successfully
+2026-05-27 22:56:22 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.044s]
+2026-05-27 22:56:22 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/mayss_products [status:200 duration:0.029s]
+2026-05-27 22:56:22 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_count [status:200 duration:0.080s]
+2026-05-27 22:56:22 | INFO     | mayss | ES index already has 303 documents
+2026-05-27 22:56:23 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/categories | Status: 200 | Time: 1.37ms
+2026-05-27 22:56:23 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 1.44ms
+2026-05-27 22:56:23 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/categories | Status: 200 | Time: 62.86ms
+2026-05-27 22:56:23 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 95.30ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/orders | Status: 200 | Time: 1.03ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/orders | Status: 200 | Time: 56.81ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/cart | Status: 200 | Time: 0.24ms
+2026-05-27 22:56:25 | INFO     | mayss | User 2 retrieved cart
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/cart | Status: 200 | Time: 12.28ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/favorites | Status: 200 | Time: 0.10ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/favorites | Status: 200 | Time: 92.81ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/auth/me | Status: 200 | Time: 0.74ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/auth/me | Status: 200 | Time: 5.69ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products/recommendations | Status: 200 | Time: 0.18ms
+2026-05-27 22:56:25 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products/recommendations | Status: 200 | Time: 28.98ms
+2026-05-27 22:56:39 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 2.24ms
+2026-05-27 22:56:39 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.017s]
+2026-05-27 22:56:45 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 0.48ms
+2026-05-27 22:56:45 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.027s]
+2026-05-27 22:56:51 | INFO     | mayss | Loading embedding model intfloat/multilingual-e5-small …
+2026-05-27 22:56:51 | INFO     | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-05-27 22:56:51 | INFO     | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: intfloat/multilingual-e5-small
+2026-05-27 22:56:58 | INFO     | mayss | Embedding model loaded.
+2026-05-27 22:56:59 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_search [status:200 duration:0.334s]
+2026-05-27 22:56:59 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_search [status:200 duration:0.334s]
+2026-05-27 22:56:59 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 19895.31ms
+2026-05-27 22:56:59 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 14060.90ms
+2026-05-27 22:57:07 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products/recommendations | Status: 200 | Time: 59.48ms
+2026-05-27 22:57:09 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.040s]
+2026-05-27 22:57:10 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_search [status:200 duration:0.053s]
+2026-05-27 22:57:10 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 282.51ms
+2026-05-27 22:57:25 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 3.88ms
+2026-05-27 22:57:25 | INFO     | elastic_transport.transport | HEAD http://elasticsearch:9200/ [status:200 duration:0.020s]
+2026-05-27 22:57:25 | INFO     | elastic_transport.transport | POST http://elasticsearch:9200/mayss_products/_search [status:200 duration:0.047s]
+2026-05-27 22:57:25 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 212.66ms
+2026-05-27 22:57:31 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products/recommendations | Status: 200 | Time: 57.09ms
+2026-05-27 22:57:33 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 2.70ms
+2026-05-27 22:57:33 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 31.00ms
+2026-05-27 22:57:35 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 0.77ms
+2026-05-27 22:57:35 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 16.65ms
+2026-05-27 22:57:36 | INFO     | mayss | RES | IP: 192.168.65.1 | OPTIONS /api/v1/products | Status: 200 | Time: 0.48ms
+2026-05-27 22:57:36 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products | Status: 200 | Time: 10.92ms
+2026-05-27 22:57:37 | INFO     | mayss | RES | IP: 192.168.65.1 | GET /api/v1/products/recommendations | Status: 200 | Time: 47.53ms

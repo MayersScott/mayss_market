@@ -1,4 +1,3 @@
-"""Promo codes and bonus wallet API."""
 import json
 from datetime import datetime
 from decimal import Decimal

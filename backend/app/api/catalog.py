@@ -80,8 +80,6 @@ def list_products(
 ):
     category_ids = _expand_category(db, category_id) if category_id else None
 
-    # Semantic path: query Elasticsearch for relevance-ordered IDs, hydrate from DB.
-    # Sort is ignored on the semantic path (relevance is the only meaningful order).
     if semantic and q and q.strip() and search_service.is_available():
         ids = search_service.search_semantic(
             q,
@@ -102,7 +100,6 @@ def list_products(
                 page=page,
                 page_size=page_size,
             )
-        # Empty result from semantic — fall through to SQL fallback below.
 
     query = db.query(Product).filter(Product.status == ProductStatus.ACTIVE)
 
@@ -173,7 +170,6 @@ def get_product(
 
 @router.get("/public/shops/{shop_id}")
 def get_public_shop(shop_id: int, db: Session = Depends(get_db)):
-    """Публичная страница магазина"""
     shop = db.query(SellerProfile).filter(SellerProfile.id == shop_id).first()
     if not shop:
         raise HTTPException(status_code=404, detail="Магазин не найден")
@@ -195,7 +191,6 @@ def get_public_shop(shop_id: int, db: Session = Depends(get_db)):
 
 @router.get("/public/users/{user_id}")
 def get_public_user(user_id: int, db: Session = Depends(get_db)):
-    """Публичная страница пользователя"""
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")

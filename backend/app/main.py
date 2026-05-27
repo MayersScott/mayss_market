@@ -43,7 +43,6 @@ app.add_middleware(
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all HTTP requests and responses."""
     start_time = time.time()
     ip = request.client.host if request.client else "unknown"
     
@@ -77,7 +76,6 @@ for router in api_routers:
     app.include_router(router, prefix=settings.API_V1_PREFIX)
 
 def _bootstrap_search_index_blocking():
-    """Ensure ES index exists; reindex all active products if empty. Best-effort."""
     try:
         from app.core.database import SessionLocal
         from app.services import search_service
@@ -107,9 +105,6 @@ def _bootstrap_search_index_blocking():
 
 @app.on_event("startup")
 def _bootstrap_search_index():
-    """Kick the search bootstrap off in a background thread so uvicorn can accept
-    requests immediately. Until indexing completes, ?semantic=true returns empty
-    results and the catalog falls back to the SQL path automatically."""
     if "pytest_db.sqlite" in settings.DATABASE_URL:
         return
     import threading

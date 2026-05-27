@@ -8,8 +8,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
-from pgvector.sqlalchemy import Vector
-
 class UserRole(str, PyEnum):
     BUYER = "buyer"
     SELLER = "seller"
@@ -98,8 +96,6 @@ class Product(Base):
     rating: Mapped[float] = mapped_column(Numeric(3, 2), default=0)
     reviews_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
-
-    embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
 
     seller: Mapped["SellerProfile"] = relationship(back_populates="products")
     category: Mapped["Category"] = relationship(back_populates="products")
