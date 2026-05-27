@@ -67,9 +67,22 @@ def admin_token(admin_user):
 
 
 @pytest.fixture
-def client():
-    """FastAPI TestClient."""
-    return TestClient(app)
+def client(db_session):
+    """FastAPI TestClient using the test DB session so app requests see test data."""
+    # Override get_db dependency to yield the same DB session used in tests
+    from app.api.deps import get_db as _get_db
+
+    def _override_get_db():
+        try:
+            yield db_session
+        finally:
+            pass
+
+    app.dependency_overrides[_get_db] = _override_get_db
+    client = TestClient(app)
+    yield client
+    client.close()
+    app.dependency_overrides.pop(_get_db, None)
 
 
 class TestBonusBalanceEndpoint:
@@ -81,14 +94,12 @@ class TestBonusBalanceEndpoint:
         
         assert response.status_code == 401
 
-    def test_get_balance_authorized(self, client: TestClient, test_token: str, test_user: User):
+    def test_get_balance_authorized(self, client: TestClient, test_token: str, test_user: User, db_session):
         """Test getting balance when authenticated."""
         # Create wallet
-        db = SessionLocal()
         wallet = BonusWallet(user_id=test_user.id, balance=Decimal("100.50"))
-        db.add(wallet)
-        db.commit()
-        db.close()
+        db_session.add(wallet)
+        db_session.commit()
         
         response = client.get(
             "/api/v1/bonuses/balance",
@@ -213,14 +224,12 @@ class TestBonusAdjustAdminEndpoint:
         assert float(data["adjusted_amount"]) == 100.00
         assert float(data["new_balance"]) == 100.00
 
-    def test_adjust_negative(self, client: TestClient, admin_token: str, test_user: User):
+    def test_adjust_negative(self, client: TestClient, admin_token: str, test_user: User, db_session):
         """Test negative adjustment."""
         # Set initial balance
-        db = SessionLocal()
         wallet = BonusWallet(user_id=test_user.id, balance=Decimal("500"))
-        db.add(wallet)
-        db.commit()
-        db.close()
+        db_session.add(wallet)
+        db_session.commit()
         
         response = client.post(
             "/api/v1/bonuses/admin/adjust",
