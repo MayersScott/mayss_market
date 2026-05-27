@@ -28,6 +28,7 @@ def test_user(db_session):
     user = User(
         email="test@example.com",
         password_hash="hashedpassword",
+        full_name="Test User",
         is_active=True,
         role=UserRole.BUYER,
     )
@@ -43,6 +44,7 @@ def admin_user(db_session):
     user = User(
         email="admin@example.com",
         password_hash="hashedpassword",
+        full_name="Admin User",
         is_active=True,
         role=UserRole.ADMIN,
     )
