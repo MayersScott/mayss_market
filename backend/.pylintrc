@@ -1,0 +1,20 @@
+[MASTER]
+ignore=alembic,venv,env,.git
+disable=
+    C0114, # включить когда будет Spinx
+    C0115, # missing-class-docstring
+    C0116, # missing-function-docstring
+    R0903, # too-few-public-methods (для Pydantic схем - норм)
+    E0213, # too-few-public-methods
+    W0613, # no-self-argument (для FastAPI зависимостей)
+    C0103, # invalid-name (в базе id, db и т.д. - норм)
+    R0801, # duplicate-code
+    E1102, # not-callable (из-за func.now() в SQLAlchemy)
+    C0415  # import-outside-toplevel (мы вынуждены иногда делать локальные импорты во избежание циклических зависимостей)
+
+max-line-length=120
+max-module-lines=500
+max-locals=15
+max-returns=6
+max-branches=12
+max-statements=50

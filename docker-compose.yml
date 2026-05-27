@@ -52,7 +52,7 @@ services:
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_CLAIMS_EMAIL: ${VAPID_CLAIMS_EMAIL:-mailto:admin@mayss.io}
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./backend:/app
       - hf-cache:/root/.cache/huggingface
@@ -61,7 +61,7 @@ services:
   frontend:
     image: nginx:alpine
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
     depends_on:
@@ -70,7 +70,7 @@ services:
   grafana:
     image: grafana/grafana:10.4.1
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_AUTH_ANONYMOUS_ENABLED=true
