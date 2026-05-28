@@ -3,7 +3,7 @@ from decimal import Decimal
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.core.database import Base, engine, SessionLocal
+from app.core.database import Base, engine, SessionLocal, get_db
 from app.models import User, UserRole
 from app.models.promotions import BonusWallet
 from app.core.security import create_access_token
@@ -66,20 +66,15 @@ def admin_token(admin_user):
     return create_access_token(subject=str(admin_user.id))
 
 
+@pytest.fixture
 def client(db_session):
-    from app.api.deps import get_db as _get_db
-
     def _override_get_db():
-        try:
-            yield db_session
-        finally:
-            pass
+        yield db_session
 
-    app.dependency_overrides[_get_db] = _override_get_db
-    client = TestClient(app)
-    yield client
-    client.close()
-    app.dependency_overrides.pop(_get_db, None)
+    app.dependency_overrides[get_db] = _override_get_db
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.pop(get_db, None)
 
 
 class TestBonusBalanceEndpoint:
